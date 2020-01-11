@@ -10,6 +10,12 @@ const auctionSchema = new Schema({
     ref: 'User',
     autopopulate: true
   },
+  status: {
+    type: String,
+    enum: ['opened', 'finished', 'draft'],
+    required: true,
+    default: 'draft'
+  },
   bidsCount: {
     type: Number,
     default: 0

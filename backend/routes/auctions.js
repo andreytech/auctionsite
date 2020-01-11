@@ -1,11 +1,11 @@
 const router = require('express').Router();
 let Exercise = require('../models/auction.model');
 
-router.route('/').get((req, res) => {
+const auctionsList = (req, res) => {
   Exercise.find()
     .then(exercises => res.json(exercises))
     .catch(err => res.status(400).json('Error: ' + err));
-});
+};
 
 router.route('/add').post((req, res) => {
   const username = req.body.username;
@@ -52,4 +52,4 @@ router.route('/update/:id').post((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-module.exports = router;
+module.exports = {auctionsList};
