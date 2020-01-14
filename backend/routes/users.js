@@ -8,7 +8,7 @@ const userRegister = async (req, res) => {
     await check('name').not().isEmpty().withMessage('Name is required').run(req);
     await check('email', 'Email is required').isEmail().run(req);
     await check('password', 'Password must be at least 8 symbols long').isLength({ min: 8 }).run(req);
-  
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -21,10 +21,12 @@ const userRegister = async (req, res) => {
 
         const existingUser = await User.findOne({ email: email });
         if (existingUser) {
-            return res.status(422).json({'errors':[{
-                'msg': 'User with provided email already exists',
-                'param': 'email',
-            }]});
+            return res.status(422).json({
+                'errors': [{
+                    'msg': 'User with provided email already exists',
+                    'param': 'email',
+                }]
+            });
         }
         const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -39,10 +41,12 @@ const userRegister = async (req, res) => {
         return res.json({ id: result.id });
     } catch (err) {
         return res.status(422).json(
-            {'errors':[{
-                'msg': 'Error: ' + err.message,
-                'param': null,
-            }]}
+            {
+                'errors': [{
+                    'msg': 'Error: ' + err.message,
+                    'param': null,
+                }]
+            }
         );
     }
 };
@@ -63,17 +67,21 @@ const userLogin = async (req, res) => {
 
         const user = await User.findOne({ email: email });
         if (!user) {
-            return res.status(422).json({'errors':[{
-                'msg': 'User with provided email does not exists',
-                'param': 'email',
-            }]});
+            return res.status(422).json({
+                'errors': [{
+                    'msg': 'User with provided email does not exists',
+                    'param': 'email',
+                }]
+            });
         }
         const isEqual = await bcrypt.compare(password, user.password);
         if (!isEqual) {
-            return res.status(422).json({'errors':[{
-                'msg': 'Password incorrect!',
-                'param': 'password',
-            }]});
+            return res.status(422).json({
+                'errors': [{
+                    'msg': 'Password incorrect!',
+                    'param': 'password',
+                }]
+            });
         }
         const token = jwt.sign(
             { userId: user.id, email: user.email },
@@ -82,15 +90,30 @@ const userLogin = async (req, res) => {
                 expiresIn: '1h'
             }
         );
-        return res.json({ userId: user.id, token: token });
+        return res.json({
+            token,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email
+            }
+        });
     } catch (err) {
         return res.status(422).json(
-            {'errors':[{
-                'msg': 'Error: ' + err.message,
-                'param': null,
-            }]}
+            {
+                'errors': [{
+                    'msg': 'Error: ' + err.message,
+                    'param': null,
+                }]
+            }
         );
     }
 };
 
-module.exports = {userRegister, userLogin};
+const getUser = async (req, res) => {
+    User.findById(req.user.id)
+        .select('-password')
+        .then(user => res.json(user));
+}
+
+module.exports = { userRegister, userLogin, getUser };

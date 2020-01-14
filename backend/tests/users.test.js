@@ -93,6 +93,7 @@ describe('userLogin testing', () => {
         const existingUser = {
             'id': mongo.Types.ObjectId(),
             'email': faker.internet.email(),
+            'name': faker.name.findName(),
             'password': '$2a$12$lHhPMhXMapZIuyqi5mOy3.oRdHUtVfnOHZt9z0J8HJLQRWdRw2O2C'
         };
         User.findOne.mockResolvedValue(existingUser);
@@ -100,7 +101,11 @@ describe('userLogin testing', () => {
         return userLogin(req, res).then(data => {
             expect(res.json).toBeCalledWith(
                 expect.objectContaining({
-                    userId: existingUser.id,
+                    user: {
+                        id: existingUser.id,
+                        email: existingUser.email,
+                        name: existingUser.name
+                    },
                     token: expect.stringMatching(/^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/),
                 })
             );
