@@ -4,7 +4,7 @@ import { tokenConfig } from './authActions';
 import { returnErrors } from './errorActions';
 
 export const getAuctions = () => dispatch => {
-  dispatch(setItemsLoading());
+  dispatch(setAuctionsLoading());
   axios
     .get('/auctions')
     .then(res =>
@@ -18,15 +18,16 @@ export const getAuctions = () => dispatch => {
     );
 };
 
-export const addAuction = item => (dispatch, getState) => {
+export const createAuction = (item, ownProps) => (dispatch, getState) => {
   axios
     .post('/auctions', item, tokenConfig(getState))
-    .then(res =>
+    .then(res => {
       dispatch({
         type: ADD_AUCTION,
         payload: res.data
-      })
-    )
+      });
+      ownProps.history.push('/');
+    })
     .catch(err =>
       dispatch(returnErrors(err.response.data, err.response.status))
     );
@@ -46,7 +47,7 @@ export const addAuction = item => (dispatch, getState) => {
 //     );
 // };
 
-export const setItemsLoading = () => {
+export const setAuctionsLoading = () => {
   return {
     type: AUCTIONS_LOADING
   };

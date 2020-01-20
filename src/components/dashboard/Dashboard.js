@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-// import Notifications from './Notifications';
 import AuctionsList from '../auction/AuctionsList';
 import Notifications from '../dashboard/Notifications';
 import { connect } from 'react-redux';
@@ -10,7 +9,7 @@ class Dashboard extends Component {
   static propTypes = {
     getAuctions: PropTypes.func.isRequired,
     auction: PropTypes.object.isRequired,
-    // isAuthenticated: PropTypes.bool
+    isAuthenticated: PropTypes.bool
   };
 
   componentDidMount() {
@@ -40,7 +39,7 @@ class Dashboard extends Component {
 
 const mapStateToProps = state => ({
   auction: state.auction,
-  // isAuthenticated: state.auth.isAuthenticated
+  isAuthenticated: state.auth.isAuthenticated
 });
 
 export default connect(

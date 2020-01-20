@@ -34,4 +34,11 @@ auctionSchema.statics = {
   }
 };
 
+var autoPopulateCreator = function(next) {
+  this.populate('creator');
+  next();
+};
+
+auctionSchema.pre('findOne', autoPopulateCreator).pre('find', autoPopulateCreator);
+
 module.exports = mongoose.model('Auction', auctionSchema);

@@ -18,7 +18,7 @@ export const loadUser = () => (dispatch, getState) => {
   dispatch({ type: USER_LOADING });
 
   axios
-    .get('/users/load', tokenConfig(getState))
+    .get('/users/current', tokenConfig(getState))
     .then(res =>
       dispatch({
         type: USER_LOADED,
@@ -114,7 +114,8 @@ export const tokenConfig = getState => {
 
   // If token, add to headers
   if (token) {
-    config.headers['x-auth-token'] = token;
+    // config.headers['x-auth-token'] = token;
+    config.headers['Authorization'] = 'Bearer' + token;
   }
 
   return config;

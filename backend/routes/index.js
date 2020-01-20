@@ -5,7 +5,7 @@ const isAuth = require('../middlewares/is-auth');
 
 router.post('/users/register', userRegister);
 router.post('/users/login', userLogin);
-router.get('/users/load', [isAuth, getUser]);
+router.get('/users/current', [isAuth, getUser]);
 
 router.get('/auctions', auctionsList);
 // router.post('/auctions', [isAuth, createAuction]);

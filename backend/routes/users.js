@@ -9,25 +9,26 @@ const userRegister = async (req, res) => {
     await check('email', 'Email is required').isEmail().run(req);
     await check('password', 'Password must be at least 8 symbols long').isLength({ min: 8 }).run(req);
 
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
+    const errors = validationResult(req).array();
 
     try {
         const email = req.body.email;
         const password = req.body.password;
         const name = req.body.name;
+        const secretKey = process.env.SECRET_KEY || '';
 
         const existingUser = await User.findOne({ email: email });
         if (existingUser) {
-            return res.status(422).json({
-                'errors': [{
-                    'msg': 'User with provided email already exists',
-                    'param': 'email',
-                }]
+            errors.push({
+                'msg': 'User with provided email already exists',
+                'param': 'email',
             });
+            
         }
+        if(errors.length) {
+            return res.status(422).json({ errors: errors });
+        }
+        
         const hashedPassword = await bcrypt.hash(password, 12);
 
         const user = new User({
@@ -36,9 +37,25 @@ const userRegister = async (req, res) => {
             name: name,
         });
 
-        const result = await user.save();
+        const newUser = await user.save();
 
-        return res.json({ id: result.id });
+        const token = jwt.sign(
+            { userId: newUser.id },
+            secretKey,
+            {
+                expiresIn: '1h'
+            }
+        );
+
+        return res.json({
+            token,
+            user: {
+                id: newUser.id,
+                name: newUser.name,
+                email: newUser.email
+            }
+        });
+
     } catch (err) {
         return res.status(422).json(
             {
@@ -84,7 +101,7 @@ const userLogin = async (req, res) => {
             });
         }
         const token = jwt.sign(
-            { userId: user.id, email: user.email },
+            { userId: user.id },
             secretKey,
             {
                 expiresIn: '1h'

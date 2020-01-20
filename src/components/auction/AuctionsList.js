@@ -3,10 +3,10 @@ import AuctionSummary from './AuctionSummary';
 
 const AucitonsList = ({ auctions }) => {
   return (
-    <div className="auctions-list section">
-      {auctions && auctions.map(auction => {
+    <div className="auctions-list section" >
+      {auctions && auctions.map((auction, key) => {
           return (
-            <AuctionSummary auction={auction} key={auction.id} />
+            <AuctionSummary auction={auction} key={key} />
           );
         })}
     </div>
